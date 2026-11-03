@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Pressable, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -5,7 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
-import Login from './src/screens/login';
+import FluxoEntrada from './src/screens/fluxoEntrada';
 import BarraInferior from './src/components/BarraInferior';
 
 // IMPORTAÇÕES DAS TELAS (Verifique se as letras maiúsculas/minúsculas dos arquivos estão certas)
@@ -76,11 +77,22 @@ function AppLogado() {
 // Decide qual "lado" do app mostrar
 function Rotas() {
   const { usuario, carregando } = useAuth();
+  const [entradaConcluida, setEntradaConcluida] = useState(false);
 
   if (carregando) {
     return <ActivityIndicator style={ESTILO_CARREGANDO} size="large" color="#2B7BD6" />;
   }
-  return usuario ? <AppLogado /> : <Login />;
+
+  // MODO DESENVOLVIMENTO: as telas de entrada aparecem sempre que o app abre,
+  // mesmo que já exista alguém logado.
+  if (!usuario || !entradaConcluida) {
+    return <FluxoEntrada usuario={usuario} onConcluir={() => setEntradaConcluida(true)} />;
+  }
+  return <AppLogado />;
+
+  // [PRODUÇÃO] apague o bloco "MODO DESENVOLVIMENTO" acima, o useState de
+  // entradaConcluida e o import do useState, e descomente a linha abaixo:
+  // return usuario ? <AppLogado /> : <FluxoEntrada />;
 }
 
 export default function App() {
