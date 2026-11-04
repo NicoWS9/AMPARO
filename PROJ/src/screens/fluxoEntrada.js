@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, BackHandler, Pressable, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, BackHandler, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 // [PRODUÇÃO 1/4] descomente o import abaixo:
@@ -8,6 +8,8 @@ import { Ionicons } from '@expo/vector-icons';
 import BoasVindas from './boasVindas';
 import EscolhaPerfil from './escolhaPerfil';
 import Login from './login';
+import CadastroUsuario from './cadastroUsuario';
+import CadastroFamiliar from './cadastroFamiliar';
 import { cores } from '../styles/tema';
 
 // =====================================================================
@@ -50,8 +52,18 @@ export async function reiniciarBoasVindas() {
 }
 */
 
-// ---------- Seta de voltar (aparece por cima da tela de Login) ----------
+// ---------- Botões que flutuam por cima da tela de Login ----------
+// (o Login é o seu arquivo; estes botões ficam por cima dele sem mexer nele)
 
+const SOMBRA_BOTAO = {
+  elevation: 4,
+  shadowColor: cores.azulTinta,
+  shadowOpacity: 0.12,
+  shadowRadius: 8,
+  shadowOffset: { width: 0, height: 3 },
+};
+
+// Seta redonda no canto superior esquerdo
 function SetaVoltar({ onPress }) {
   const insets = useSafeAreaInsets();
   return (
@@ -71,15 +83,77 @@ function SetaVoltar({ onPress }) {
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 10,
-        elevation: 4,
-        shadowColor: cores.azulTinta,
-        shadowOpacity: 0.12,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 3 },
+        ...SOMBRA_BOTAO,
       }}
     >
       <Ionicons name="arrow-back" size={22} color={cores.azulTinta} />
     </Pressable>
+  );
+}
+
+// Pílula "Criar conta" no canto superior direito
+function BotaoCriarConta({ onPress }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel="Criar conta"
+      hitSlop={8}
+      style={{
+        position: 'absolute',
+        top: insets.top + 8,
+        right: 16,
+        height: 48,
+        paddingHorizontal: 18,
+        borderRadius: 24,
+        backgroundColor: cores.azulMarinho,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10,
+        ...SOMBRA_BOTAO,
+      }}
+    >
+      <Text style={{ color: cores.ouro, fontSize: 15, fontWeight: '800' }}>Criar conta</Text>
+    </Pressable>
+  );
+}
+
+// SÓ DESENVOLVIMENTO: quando o app abre com alguém já logado, o Login aparece normalmente
+// e este botão no rodapé deixa você entrar no app sem digitar a senha de novo.
+function BotaoContinuarLogado({ onPress }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View
+      pointerEvents="box-none"
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: insets.bottom + 16,
+        alignItems: 'center',
+        zIndex: 10,
+      }}
+    >
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel="Continuar no app"
+        style={{
+          height: 48,
+          paddingHorizontal: 20,
+          borderRadius: 24,
+          backgroundColor: cores.branco,
+          alignItems: 'center',
+          justifyContent: 'center',
+          ...SOMBRA_BOTAO,
+        }}
+      >
+        <Text style={{ color: cores.azulMarinho, fontSize: 15, fontWeight: '800' }}>
+          Continuar no app (modo teste)
+        </Text>
+      </Pressable>
+    </View>
   );
 }
 
@@ -92,8 +166,10 @@ const ESTILO_CARREGANDO = {
   backgroundColor: cores.azulMarinho,
 };
 
-// Tudo o que aparece ANTES do login:
-//   Boas-vindas → Escolha do perfil → Login
+// Telas e caminhos:
+//   "Começar"             → Escolha do perfil → Cadastro (usuário ou familiar)
+//   "Já tenho uma conta"  → Login
+//   Login ⇄ Cadastro (pelo botão "Criar conta" e pelo link "Entrar")
 // Props (vindas do App.js, só usadas no modo desenvolvimento):
 //   usuario    - quem está logado (ou null)
 //   onConcluir - avisa o App.js que já pode abrir o app
@@ -103,8 +179,12 @@ export default function FluxoEntrada({ usuario, onConcluir }) {
   // [PRODUÇÃO 3/4] apague a linha acima e descomente esta:
   // const [passo, setPasso] = useState('carregando');
 
-  // eslint-disable-next-line no-unused-vars
-  const [perfil, setPerfil] = useState(null); // 'usuario' ou 'familia' (ainda não é usado)
+  const [perfil, setPerfil] = useState(null); // 'usuario' ou 'familia'
+  // De onde a pessoa veio ao abrir o cadastro ('perfil' ou 'login'), para o "voltar" ir ao lugar certo
+  const [origemCadastro, setOrigemCadastro] = useState('login');
+
+  // Quem já estava logado quando o app abriu (modo desenvolvimento)
+  const usuarioInicial = useRef(usuario);
 
   // [PRODUÇÃO 4/4] descomente este bloco (lê se as boas-vindas já foram vistas):
   // useEffect(() => {
@@ -117,15 +197,19 @@ export default function FluxoEntrada({ usuario, onConcluir }) {
   //   };
   // }, []);
 
-  // Se já existe alguém logado quando chega no passo do login, não precisa pedir
-  // login de novo: avisa o App.js para abrir o app.
+  // Fez login agora (a pessoa que entrou é diferente de quem estava ao abrir o app):
+  // avisa o App.js para abrir o app.
   useEffect(() => {
-    if (passo === 'login' && usuario) onConcluir?.();
+    if (passo === 'login' && usuario && usuario !== usuarioInicial.current) onConcluir?.();
   }, [passo, usuario, onConcluir]);
 
-  // Botão "voltar" do Android: Login → Perfil → Boas-vindas (nas outras telas, sai do app)
+  // Botão "voltar" do Android: Cadastro → Login → Perfil → Boas-vindas (nas outras telas, sai do app)
   useEffect(() => {
     const aoVoltar = () => {
+      if (passo === 'cadastroUsuario' || passo === 'cadastroFamilia') {
+        setPasso(origemCadastro);
+        return true;
+      }
       if (passo === 'login') {
         setPasso('perfil');
         return true;
@@ -138,12 +222,24 @@ export default function FluxoEntrada({ usuario, onConcluir }) {
     };
     const assinatura = BackHandler.addEventListener('hardwareBackPress', aoVoltar);
     return () => assinatura.remove();
-  }, [passo]);
+  }, [passo, origemCadastro]);
 
   const sairDasBoasVindas = (proximoPasso) => {
     // [PRODUÇÃO] descomente a linha abaixo para gravar que a pessoa já viu as boas-vindas:
     // marcarBoasVindasVistas();
     setPasso(proximoPasso);
+  };
+
+  // Quando o formulário de cadastro está certo
+  const aoCadastrar = (dados) => {
+    // AMANHÃ: aqui entra a chamada ao banco (enviar `dados` para o servidor).
+    const { senha, ...semSenha } = dados; // a senha nunca vai para o console
+    console.log('Cadastro recebido (ainda sem banco):', semSenha);
+    Alert.alert(
+      'Formulário preenchido',
+      'Os dados ainda não são salvos: o banco será ligado em seguida.'
+    );
+    setPasso('login');
   };
 
   if (passo === 'carregando') {
@@ -169,16 +265,54 @@ export default function FluxoEntrada({ usuario, onConcluir }) {
         onVoltar={() => setPasso('boasVindas')}
         onEscolher={(escolhido) => {
           setPerfil(escolhido);
-          setPasso('login');
+          setOrigemCadastro('perfil');
+          setPasso(escolhido === 'familia' ? 'cadastroFamilia' : 'cadastroUsuario');
         }}
       />
     );
   }
 
+  if (passo === 'cadastroUsuario') {
+    return (
+      <CadastroUsuario
+        onVoltar={() => setPasso(origemCadastro)}
+        onCadastrar={aoCadastrar}
+        onTenhoConta={() => setPasso('login')}
+        onTrocarPerfil={() => {
+          setPerfil('familia');
+          setPasso('cadastroFamilia');
+        }}
+      />
+    );
+  }
+
+  if (passo === 'cadastroFamilia') {
+    return (
+      <CadastroFamiliar
+        onVoltar={() => setPasso(origemCadastro)}
+        onCadastrar={aoCadastrar}
+        onTenhoConta={() => setPasso('login')}
+        onTrocarPerfil={() => {
+          setPerfil('usuario');
+          setPasso('cadastroUsuario');
+        }}
+      />
+    );
+  }
+
+  // passo === 'login'
+  const jaEstavaLogado = !!usuario && usuario === usuarioInicial.current;
   return (
     <View style={{ flex: 1 }}>
       <Login />
       <SetaVoltar onPress={() => setPasso('perfil')} />
+      <BotaoCriarConta
+        onPress={() => {
+          setOrigemCadastro('login');
+          setPasso(perfil === 'familia' ? 'cadastroFamilia' : 'cadastroUsuario');
+        }}
+      />
+      {jaEstavaLogado ? <BotaoContinuarLogado onPress={() => onConcluir?.()} /> : null}
     </View>
   );
 }
