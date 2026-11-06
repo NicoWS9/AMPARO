@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { BARRA_ALTURA } from '../components/BarraInferior';
+import { BARRA_ALTURA } from '../constants/layout';
 import { sombraPadrao } from './tema';
 
 export const estilosBarraInferior = StyleSheet.create({

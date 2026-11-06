@@ -6,9 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { cores } from '../styles/tema';
 import { estilosBarraInferior } from '../styles/BarraInferiorStyles';
+import { BARRA_ALTURA } from '../constants/layout';
 
-
-export const BARRA_ALTURA = 64;
 
 // Altura total ocupada pela barra flutuante (barra + margem inferior).
 // Use nas telas para reservar espaço no fim do conteúdo.
