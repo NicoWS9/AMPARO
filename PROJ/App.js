@@ -42,8 +42,8 @@ const opcoesInterna = (titulo) => ({ navigation }) => ({
 });
 
 // As opções são criadas uma única vez, fora do componente
+// (Medicamentos NÃO está aqui: ela tem cabeçalho próprio dentro da tela)
 const TELAS_INTERNAS = [
-  { nome: 'Medicamentos', componente: Medicamentos, titulo: 'Meus Remédios' },
   { nome: 'Exercicios', componente: Exercicios, titulo: 'Exercícios Diários' },
   { nome: 'Contatos', componente: Contatos, titulo: 'Meus Contatos' },
   { nome: 'Emergencia', componente: Emergencia, titulo: 'Telefone de Emergência' },
@@ -69,6 +69,8 @@ function AppLogado() {
         {TELAS_INTERNAS.map(({ nome, componente, opcoes }) => (
           <Tab.Screen key={nome} name={nome} component={componente} options={opcoes} />
         ))}
+        {/* Sem options: usa headerShown: false do navegador (sem barra branca) */}
+        <Tab.Screen name="Medicamentos" component={Medicamentos} />
       </Tab.Navigator>
     </NavigationContainer>
   );
