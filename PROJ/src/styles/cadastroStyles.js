@@ -98,6 +98,14 @@ export const estilosCadastro = StyleSheet.create({
     ...sombraPadrao,
   },
   botaoTexto: { fontSize: 18, fontWeight: '800', color: cores.ouro },
+  botaoDesativado: { opacity: 0.7 },
+  erroGeral: {
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: '700',
+    color: cores.emergencia,
+    textAlign: 'center',
+  },
   pressionado: { opacity: 0.88, transform: [{ scale: 0.99 }] },
 
   rodape: { alignItems: 'center', gap: 6, marginTop: 4 },

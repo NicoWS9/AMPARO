@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -38,7 +38,8 @@ const VAZIO = {
 
 // Cadastro de familiar / cuidador (perfil "familia").
 // Props (todas opcionais):
-//   onCadastrar(dados) - chamada quando o formulário está certo. `dados` já vem pronto para o banco:
+//   onCadastrar(dados) - chamada quando o formulário está certo (pode devolver uma Promise
+//       com { ok, erro, campos }: os erros do servidor aparecem na tela). `dados` já vem pronto para o banco:
 //       { nome, telefone, email (ou null), senha, perfil: 'familia',
 //         parentesco, telefoneAcompanhado (só números), recebeAlertas (true/false) }
 //       -> os três últimos alimentam a tabela vinculos_familia
@@ -55,6 +56,12 @@ export default function CadastroFamiliar({
 
   const [dados, setDados] = useState(VAZIO);
   const [erros, setErros] = useState({});
+  const [enviando, setEnviando] = useState(false);
+  const [erroGeral, setErroGeral] = useState('');
+
+  // evita atualizar a tela depois que ela já foi fechada
+  const ativo = useRef(true);
+  useEffect(() => () => { ativo.current = false; }, []);
 
   const telefoneRef = useRef(null);
   const emailRef = useRef(null);
@@ -66,7 +73,26 @@ export default function CadastroFamiliar({
     if (erros[campo]) setErros((atual) => ({ ...atual, [campo]: undefined }));
   };
 
-  const cadastrar = () => {
+  // Envia os dados e mostra na tela o que o servidor responder
+  const enviar = async (pacote) => {
+    setErroGeral('');
+    setEnviando(true);
+    try {
+      const resultado = await onCadastrar?.(pacote);
+      if (resultado && resultado.ok === false) {
+        const doServidor = resultado.campos ?? {};
+        setErros(doServidor); // mensagem embaixo do campo certo
+        setErroGeral(
+          Object.keys(doServidor).length > 0 ? '' : resultado.erro ?? 'Não foi possível cadastrar.'
+        );
+      }
+    } finally {
+      if (ativo.current) setEnviando(false);
+    }
+  };
+
+  const cadastrar = async () => {
+    if (enviando) return;
     const novos = {};
     if (!nomeCompletoValido(dados.nome)) novos.nome = 'Digite seu nome e sobrenome.';
     if (!telefoneValido(dados.telefone)) novos.telefone = 'Digite o telefone com DDD. Ex.: (42) 99999-8888';
@@ -82,7 +108,7 @@ export default function CadastroFamiliar({
     setErros(novos);
     if (Object.keys(novos).length > 0) return;
 
-    onCadastrar?.({
+    await enviar({
       nome: dados.nome.trim(),
       telefone: somenteNumeros(dados.telefone),
       email: dados.email.trim() ? dados.email.trim().toLowerCase() : null,
@@ -241,13 +267,27 @@ export default function CadastroFamiliar({
             </View>
           </View>
 
+          {erroGeral ? (
+            <Text accessibilityLiveRegion="polite" style={estilosCadastro.erroGeral}>
+              {erroGeral}
+            </Text>
+          ) : null}
+
           <Pressable
             onPress={cadastrar}
+            disabled={enviando}
             accessibilityRole="button"
             accessibilityLabel="Criar conta"
-            style={({ pressed }) => [estilosCadastro.botao, pressed && estilosCadastro.pressionado]}
+            accessibilityState={{ busy: enviando, disabled: enviando }}
+            style={({ pressed }) => [
+              estilosCadastro.botao,
+              enviando && estilosCadastro.botaoDesativado,
+              pressed && estilosCadastro.pressionado,
+            ]}
           >
-            <Text style={estilosCadastro.botaoTexto}>Criar conta</Text>
+            <Text style={estilosCadastro.botaoTexto}>
+              {enviando ? 'Criando conta...' : 'Criar conta'}
+            </Text>
           </Pressable>
 
           <View style={estilosCadastro.rodape}>

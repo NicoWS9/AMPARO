@@ -10,6 +10,7 @@ import EscolhaPerfil from './escolhaPerfil';
 import Login from './login';
 import CadastroUsuario from './cadastroUsuario';
 import CadastroFamiliar from './cadastroFamiliar';
+import { api } from '../services/api';
 import { cores } from '../styles/tema';
 
 // =====================================================================
@@ -230,16 +231,15 @@ export default function FluxoEntrada({ usuario, onConcluir }) {
     setPasso(proximoPasso);
   };
 
-  // Quando o formulário de cadastro está certo
-  const aoCadastrar = (dados) => {
-    // AMANHÃ: aqui entra a chamada ao banco (enviar `dados` para o servidor).
-    const { senha, ...semSenha } = dados; // a senha nunca vai para o console
-    console.log('Cadastro recebido (ainda sem banco):', semSenha);
-    Alert.alert(
-      'Formulário preenchido',
-      'Os dados ainda não são salvos: o banco será ligado em seguida.'
-    );
+  // Quando o formulário de cadastro está certo: envia para o servidor.
+  // Se der erro, devolve o resultado e a própria tela de cadastro mostra a mensagem.
+  const aoCadastrar = async (dados) => {
+    const resultado = await api.cadastrar(dados);
+    if (!resultado.ok) return resultado;
+
+    Alert.alert('Conta criada!', 'Seu cadastro foi feito com sucesso.');
     setPasso('login');
+    return resultado;
   };
 
   if (passo === 'carregando') {
