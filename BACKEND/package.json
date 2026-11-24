@@ -2,9 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "db.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "testar-conexao": "node testarConexao.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.9",
     "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.24.6"
   }
 }

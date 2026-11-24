@@ -1,5 +1,5 @@
-// Valores compartilhados entre os arquivos de estilo (cores, sombra, fonte).
-import { Platform } from 'react-native';
+// Valores compartilhados entre os arquivos de estilo (cores, sombra, fonte, medidas).
+import { Platform, StyleSheet } from 'react-native';
 
 export const cores = {
   azulMarinho: '#1B2A5E',
@@ -14,7 +14,17 @@ export const cores = {
   emergencia: '#B23A2A',
   emergenciaSuave: '#FBE3DF',
   branco: '#fff',
+  borda: '#D5D9E6', // borda de campos, chips e cartões claros
+  placeholder: '#7A8296',
+  // tons de lilás do perfil "família"
+  lilas: '#7B63C9',
+  lilasFundo: '#E7E1F6',
+  lilasEscuro: '#4F3F94', // texto/ícone sobre o fundo lilás (contraste ~6,7:1)
+  lilasBorda: '#B9C0E8',
 };
+
+// Altura da barra inferior (sem contar a área segura do celular)
+export const BARRA_ALTURA = 64;
 
 export const fonteSerifada = Platform.select({
   ios: 'Georgia',
@@ -30,4 +40,36 @@ export const sombraPadrao = Platform.select({
     shadowOffset: { width: 0, height: 6 },
   },
   android: { elevation: 4 },
+});
+
+// Peças de layout que se repetem em várias telas
+export const estilosComuns = StyleSheet.create({
+  telaCreme: { flex: 1, backgroundColor: cores.fundoCreme },
+  // linha do topo: botão voltar à esquerda, logo à direita
+  topo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  botaoRedondo: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: cores.branco,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...sombraPadrao,
+  },
+  marca: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: cores.azulMarinho,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tituloSerifado: {
+    fontFamily: fonteSerifada,
+    fontSize: 32,
+    lineHeight: 38,
+    fontWeight: '700',
+    color: cores.textoEscuro,
+  },
+  pressionado: { opacity: 0.88, transform: [{ scale: 0.99 }] },
 });

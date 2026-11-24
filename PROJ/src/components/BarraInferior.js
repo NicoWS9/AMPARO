@@ -4,9 +4,8 @@ import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-import { cores } from '../styles/tema';
+import { cores, BARRA_ALTURA } from '../styles/tema';
 import { estilosBarraInferior } from '../styles/BarraInferiorStyles';
-import { BARRA_ALTURA } from '../constants/layout';
 
 
 // Altura total ocupada pela barra flutuante (barra + margem inferior).

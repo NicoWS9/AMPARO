@@ -6,25 +6,25 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const { entrar } = useAuth();
-  const [email, setEmail] = useState('');
+  const [login, setLogin] = useState(''); // telefone ou e-mail
   const [senha, setSenha] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
 
   async function handleEntrar() {
-    if (!email.trim() || !senha) {
-      setErro('Preencha o e-mail e a senha.');
+    if (!login.trim() || !senha) {
+      setErro('Preencha o telefone (ou e-mail) e a senha.');
       return;
     }
     setErro('');
     setCarregando(true);
     try {
-      await entrar(email, senha);
-      // ao dar certo, o App troca a tela sozinho (usuario deixa de ser null)
+      // O AuthContext manda para o servidor (POST /login), que confere no banco
+      // e devolve um token. Ao dar certo, o App troca a tela sozinho (usuario deixa de ser null).
+      await entrar(login.trim(), senha);
     } catch (e) {
-      setErro(e.message);
-    } finally {
+      setErro(e.message); // a mensagem já vem pronta do servidor (ex.: senha incorreta)
       setCarregando(false);
     }
   }
@@ -38,15 +38,16 @@ export default function Login() {
         <Text style={styles.titulo}>Olá!</Text>
         <Text style={styles.subtitulo}>Entre na sua conta para continuar</Text>
 
-        <Text style={styles.label}>E-mail</Text>
+        <Text style={styles.label}>Telefone ou e-mail</Text>
         <TextInput
           style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholder="seuemail@exemplo.com"
-          keyboardType="email-address"
+          value={login}
+          onChangeText={setLogin}
+          placeholder="(42) 99999-8888 ou seu e-mail"
           autoCapitalize="none"
           autoCorrect={false}
+          textContentType="username"
+          autoComplete="username"
         />
 
         <Text style={styles.label}>Senha</Text>
@@ -58,6 +59,10 @@ export default function Login() {
             placeholder="Sua senha"
             secureTextEntry={!mostrarSenha}
             autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="password"
+            autoComplete="password"
+            onSubmitEditing={handleEntrar}
           />
           <Pressable onPress={() => setMostrarSenha(!mostrarSenha)} style={styles.olho}>
             <Ionicons name={mostrarSenha ? 'eye-off-outline' : 'eye-outline'} size={22} color="#555" />

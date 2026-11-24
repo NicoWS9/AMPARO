@@ -3,7 +3,7 @@ import { View, Text, TextInput, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { cores } from '../styles/tema';
-import { estilosCampoTexto, corPlaceholder } from '../styles/campoTextoStyles';
+import { estilosCampoTexto } from '../styles/campoTextoStyles';
 
 // Campo de formulário: rótulo em cima, caixa com ícone, dica ou mensagem de erro embaixo.
 //   rotulo   - texto acima do campo
@@ -40,7 +40,7 @@ const CampoTexto = forwardRef(function CampoTexto(
         ) : null}
 
         <TextInput
-          placeholderTextColor={corPlaceholder}
+          placeholderTextColor={cores.placeholder}
           {...resto}
           ref={ref}
           value={valor}

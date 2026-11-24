@@ -1,8 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { cores } from './tema';
 
-export const corPlaceholder = '#7A8296';
-
 export const estilosCampoTexto = StyleSheet.create({
   grupo: { gap: 6 },
   rotulo: { fontSize: 15, fontWeight: '700', color: cores.textoEscuro },
@@ -15,7 +13,7 @@ export const estilosCampoTexto = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: cores.branco,
     borderWidth: 1.5,
-    borderColor: '#D5D9E6',
+    borderColor: cores.borda,
     paddingHorizontal: 14,
     gap: 10,
   },

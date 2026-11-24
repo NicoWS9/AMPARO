@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Pressable, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,7 +8,7 @@ import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import FluxoEntrada from './src/screens/fluxoEntrada';
 import BarraInferior from './src/components/BarraInferior';
 
-// IMPORTAÇÕES DAS TELAS (Verifique se as letras maiúsculas/minúsculas dos arquivos estão certas)
+// IMPORTAÇÕES DAS TELAS 
 import Inicio from './src/screens/Inicio';
 import Agenda from './src/screens/agenda';
 import Perfil from './src/screens/perfil';
@@ -20,15 +19,14 @@ import Contatos from './src/screens/contatos';
 
 const Tab = createBottomTabNavigator();
 
-// Telas que aparecem na barra (o botão de cada uma é desenhado em BarraInferior)
+// Telas que aparecem na barra 
 const TELAS_PRINCIPAIS = [
   { nome: 'Início', componente: Inicio },
   { nome: 'Agenda', componente: Agenda },
   { nome: 'Perfil', componente: Perfil },
 ];
 
-// Telas "internas": registradas no navigator, sem botão na barra,
-// com cabeçalho próprio e seta de voltar.
+// Botao de voltar a tela anterior
 const botaoVoltar = (navigation) => () => (
   <Pressable onPress={() => navigation.goBack()} style={{ marginLeft: 16 }}>
     <Ionicons name="arrow-back" size={24} color="#1F2D3D" />
@@ -42,7 +40,6 @@ const opcoesInterna = (titulo) => ({ navigation }) => ({
 });
 
 // As opções são criadas uma única vez, fora do componente
-// (Medicamentos NÃO está aqui: ela tem cabeçalho próprio dentro da tela)
 const TELAS_INTERNAS = [
   { nome: 'Exercicios', componente: Exercicios, titulo: 'Exercícios Diários' },
   { nome: 'Contatos', componente: Contatos, titulo: 'Meus Contatos' },
@@ -79,22 +76,13 @@ function AppLogado() {
 // Decide qual "lado" do app mostrar
 function Rotas() {
   const { usuario, carregando } = useAuth();
-  const [entradaConcluida, setEntradaConcluida] = useState(false);
 
   if (carregando) {
     return <ActivityIndicator style={ESTILO_CARREGANDO} size="large" color="#2B7BD6" />;
   }
 
-  // MODO DESENVOLVIMENTO: as telas de entrada aparecem sempre que o app abre,
-  // mesmo que já exista alguém logado.
-  if (!usuario || !entradaConcluida) {
-    return <FluxoEntrada usuario={usuario} onConcluir={() => setEntradaConcluida(true)} />;
-  }
-  return <AppLogado />;
-
-  // [PRODUÇÃO] apague o bloco "MODO DESENVOLVIMENTO" acima, o useState de
-  // entradaConcluida e o import do useState, e descomente a linha abaixo:
-  // return usuario ? <AppLogado /> : <FluxoEntrada />;
+  // Logado (token válido): mostra o app. Senão: telas de entrada (boas-vindas, login, cadastro).
+  return usuario ? <AppLogado /> : <FluxoEntrada />;
 }
 
 export default function App() {

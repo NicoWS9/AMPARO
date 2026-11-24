@@ -2,10 +2,10 @@ import { View, Text, ScrollView, Pressable, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-import LogoAmparo from '../components/logoAmparo';
 import AneisDecorativos from '../components/aneisDecorativos';
-import { cores } from '../styles/tema';
-import { estilosEscolhaPerfil, corLilas } from '../styles/escolhaPerfilStyles';
+import { TopoComLogo } from '../components/cabecalhoCadastro';
+import { cores, estilosComuns } from '../styles/tema';
+import { estilosEscolhaPerfil } from '../styles/escolhaPerfilStyles';
 
 // Tela "Como você vai usar o Amparo?".
 // Use por props:  <EscolhaPerfil onVoltar={...} onEscolher={(perfil) => ...} />
@@ -18,27 +18,18 @@ export default function EscolhaPerfil({ navigation, onVoltar, onEscolher }) {
     onEscolher ? onEscolher(perfil) : navigation?.navigate('Login', { perfil });
 
   return (
-    <SafeAreaView style={estilosEscolhaPerfil.container}>
+    <SafeAreaView style={estilosComuns.telaCreme}>
       <StatusBar barStyle="dark-content" backgroundColor={cores.fundoCreme} />
       <ScrollView
         contentContainerStyle={estilosEscolhaPerfil.conteudo}
         showsVerticalScrollIndicator={false}
       >
-        <View style={estilosEscolhaPerfil.topo}>
-          <Pressable
-            onPress={voltar}
-            accessibilityRole="button"
-            accessibilityLabel="Voltar"
-            style={estilosEscolhaPerfil.botaoVoltar}
-          >
-            <Ionicons name="chevron-back" size={22} color={cores.azulTinta} />
-          </Pressable>
-          <View style={estilosEscolhaPerfil.marca}>
-            <LogoAmparo tamanho={24} />
-          </View>
-        </View>
+        <TopoComLogo onVoltar={voltar} />
 
-        <Text accessibilityRole="header" style={estilosEscolhaPerfil.titulo}>
+        <Text
+          accessibilityRole="header"
+          style={[estilosComuns.tituloSerifado, estilosEscolhaPerfil.titulo]}
+        >
           Como você vai usar o Amparo?
         </Text>
         <Text style={estilosEscolhaPerfil.subtitulo}>Escolha uma opção para continuar.</Text>
@@ -50,7 +41,7 @@ export default function EscolhaPerfil({ navigation, onVoltar, onEscolher }) {
           accessibilityLabel="Eu uso o app. Entrar com meu celular"
           style={({ pressed }) => [
             estilosEscolhaPerfil.cardEscuro,
-            pressed && estilosEscolhaPerfil.pressionado,
+            pressed && estilosComuns.pressionado,
           ]}
         >
           <AneisDecorativos tamanho={230} topo={-80} direita={-70} />
@@ -78,11 +69,11 @@ export default function EscolhaPerfil({ navigation, onVoltar, onEscolher }) {
           accessibilityLabel="Sou da família. Entrar como família"
           style={({ pressed }) => [
             estilosEscolhaPerfil.cardClaro,
-            pressed && estilosEscolhaPerfil.pressionado,
+            pressed && estilosComuns.pressionado,
           ]}
         >
           <View style={estilosEscolhaPerfil.iconeClaro}>
-            <Ionicons name="people-outline" size={24} color={corLilas} />
+            <Ionicons name="people-outline" size={24} color={cores.lilas} />
           </View>
           <Text style={[estilosEscolhaPerfil.cardTitulo, estilosEscolhaPerfil.tituloEscuro]}>
             Sou da família

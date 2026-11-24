@@ -61,3 +61,26 @@ export function nomeCompletoValido(texto = '') {
 }
 
 export const senhaValida = (texto = '') => texto.length >= 6;
+
+// ---------- Partes comuns aos dois cadastros (usuário e familiar) ----------
+
+// Mensagens de erro dos campos nome, telefone, e-mail e senha ({} se estiver tudo certo)
+export function validarDadosBasicos({ nome, telefone, email, senha }) {
+  const erros = {};
+  if (!nomeCompletoValido(nome)) erros.nome = 'Digite seu nome e sobrenome.';
+  if (!telefoneValido(telefone)) erros.telefone = 'Digite o telefone com DDD. Ex.: (42) 99999-8888';
+  if (email.trim() && !emailValido(email)) erros.email = 'Esse e-mail não parece certo. Confira.';
+  if (!senhaValida(senha)) erros.senha = 'A senha precisa ter pelo menos 6 caracteres.';
+  return erros;
+}
+
+// Os mesmos campos já limpos, no formato que o servidor espera
+export function montarDadosBasicos({ nome, telefone, email, senha }) {
+  const emailLimpo = email.trim().toLowerCase();
+  return {
+    nome: nome.trim(),
+    telefone: somenteNumeros(telefone),
+    email: emailLimpo || null,
+    senha,
+  };
+}

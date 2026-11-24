@@ -151,7 +151,7 @@ export default function Inicio({ navigation }) {
         <LinhaCard
           icone="happy-outline"
           cor="#7B63C9"
-          corFundo="#E7E1F6"
+          corFundo={cores.lilasFundo}
           titulo="Como você está hoje?"
           subtitulo="Um toque avisa sua família"
           onPress={() => navigation.navigate('Contatos')}
@@ -180,7 +180,7 @@ export default function Inicio({ navigation }) {
           <CardMeio
             icone="people-outline"
             cor="#7B63C9"
-            corFundo="#E7E1F6"
+            corFundo={cores.lilasFundo}
             titulo="Apoio"
             subtitulo="Ligue para a família"
             onPress={() => navigation.navigate('Contatos')}

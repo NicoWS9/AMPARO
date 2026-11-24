@@ -103,3 +103,24 @@ export function validarCadastro(corpo) {
     },
   };
 }
+
+// Login: a pessoa pode entrar com o TELEFONE (obrigatório no cadastro) ou com o E-MAIL.
+// Devolve:
+//   campos - mensagens de erro por campo ({} se estiver tudo certo)
+//   dados  - { login, senha }, com o login já limpo:
+//            e-mail em minúsculas, ou telefone só com números
+export function validarLogin(corpo) {
+  const c = corpo && typeof corpo === 'object' ? corpo : {};
+  const campos = {};
+
+  const digitado = texto(c.login);
+  const senha = typeof c.senha === 'string' ? c.senha : '';
+
+  if (!digitado) campos.login = 'Digite seu telefone ou e-mail.';
+  if (!senha) campos.senha = 'Digite sua senha.';
+
+  // Tem "@"? Então é e-mail. Senão, tratamos como telefone.
+  const login = digitado.includes('@') ? digitado.toLowerCase() : somenteNumeros(digitado);
+
+  return { campos, dados: { login, senha } };
+}

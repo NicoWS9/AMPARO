@@ -2,27 +2,35 @@ import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import LogoAmparo from './logoAmparo';
-import { cores } from '../styles/tema';
-import { estilosCadastro, corLilasEscuro } from '../styles/cadastroStyles';
+import { cores, estilosComuns } from '../styles/tema';
+import { estilosCadastro } from '../styles/cadastroStyles';
+
+// Linha do topo: botão redondo de voltar à esquerda e logo à direita.
+// Usada nas telas de cadastro e na Escolha do perfil.
+export function TopoComLogo({ onVoltar }) {
+  return (
+    <View style={estilosComuns.topo}>
+      <Pressable
+        onPress={onVoltar}
+        accessibilityRole="button"
+        accessibilityLabel="Voltar"
+        style={estilosComuns.botaoRedondo}
+      >
+        <Ionicons name="chevron-back" size={22} color={cores.azulTinta} />
+      </Pressable>
+      <View style={estilosComuns.marca}>
+        <LogoAmparo tamanho={24} />
+      </View>
+    </View>
+  );
+}
 
 // Topo comum das telas de cadastro: voltar + logo, etiqueta do perfil, título e subtítulo.
 //   familia  - false: etiqueta azul ("Eu uso o app") | true: etiqueta lilás ("Sou da família")
 export default function CabecalhoCadastro({ onVoltar, familia, titulo, subtitulo }) {
   return (
     <>
-      <View style={estilosCadastro.topo}>
-        <Pressable
-          onPress={onVoltar}
-          accessibilityRole="button"
-          accessibilityLabel="Voltar"
-          style={estilosCadastro.botaoVoltar}
-        >
-          <Ionicons name="chevron-back" size={22} color={cores.azulTinta} />
-        </Pressable>
-        <View style={estilosCadastro.marca}>
-          <LogoAmparo tamanho={24} />
-        </View>
-      </View>
+      <TopoComLogo onVoltar={onVoltar} />
 
       <View
         style={[
@@ -33,7 +41,7 @@ export default function CabecalhoCadastro({ onVoltar, familia, titulo, subtitulo
         <Ionicons
           name={familia ? 'people-outline' : 'person-outline'}
           size={16}
-          color={familia ? corLilasEscuro : cores.ouro}
+          color={familia ? cores.lilasEscuro : cores.ouro}
         />
         <Text
           style={[
@@ -45,7 +53,7 @@ export default function CabecalhoCadastro({ onVoltar, familia, titulo, subtitulo
         </Text>
       </View>
 
-      <Text accessibilityRole="header" style={estilosCadastro.titulo}>
+      <Text accessibilityRole="header" style={estilosComuns.tituloSerifado}>
         {titulo}
       </Text>
       <Text style={estilosCadastro.subtitulo}>{subtitulo}</Text>
